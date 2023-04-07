@@ -1,0 +1,5 @@
+ProfileName=ccs-prod-mh
+UserPoolID=ap-northeast-1_DGQcuxKYy
+aws --profile ${ProfileName} cognito-idp list-users --user-pool-id ${UserPoolID} \
+--attributes-to-get "given_name" "family_name" "email" "custom:employee_id" | jq -r '.Users[] | [.Username, .Attributes[].Value, .Enabled, .UserStatus, .UserLastModifiedDate, .UserCreateDate] | @csv' \
+> Cognito-user-list.csv
