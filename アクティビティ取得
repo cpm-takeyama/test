@@ -1,0 +1,8 @@
+ProfileName=ccs-prod-mh
+STARTDATE=`date -j -f "%Y-%m-%d %H:%M:%S" "2022-08-20 00:00:00" +%s`
+END__DATE=`date -j -f "%Y-%m-%d %H:%M:%S" "2022-09-06 23:59:00" +%s`
+
+aws --profile ${ProfileName} dynamodb scan --table-name ccs-prod-APIActionLog \
+    --filter-expression  "created_timestamp BETWEEN :s_created_timestamp AND :e_created_timestamp" \
+    --expression-attribute-values  "{\":s_created_timestamp\": {\"S\": \"${STARTDATE}000\"}, \":e_created_timestamp\": {\"S\": \"${END__DATE}000\"}}" \
+    --page-size 100  | jq -r '.Items[] | [.created_timestamp.S, .api_domain.S, .method.S, .api_path.S, .uid.S, .path_parameter.S, (.body.M|tostring)] | @csv' > APIlog-list-from-to.csv
